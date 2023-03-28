@@ -1,2 +1,7 @@
 zig-cache 
 zig-out 
+gdb 
+opensbi* 
+utils 
+*.log 
+xpack-riscv-none-elf-gcc-*

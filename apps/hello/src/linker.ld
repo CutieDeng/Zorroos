@@ -4,7 +4,6 @@ SECTIONS {
     . = 0x80400000; 
     PROVIDE (_start = .); 
     .text : { *(.text) }
-    .data : { *(.data) }
+    .data : { *(.data .rodata) }
     .bss : { *(.bss) } 
-    .rodata : { *(.rodata) } 
 }

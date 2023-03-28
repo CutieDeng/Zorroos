@@ -29,29 +29,20 @@ pub fn panic(error_message: []const u8, stack: ?*std.builtin.StackTrace, len: ?u
 
 pub fn init() void {
     inline for (rt.init) |r | r(); 
-    set_trap(); 
 }
 
 const root = @import("root"); 
 
-fn set_trap() callconv(.C) void {
-    // the addr [XLEN - 1: 2] handle addr ; 
-    // mode = 0 : pc to base 
-    // assume the base is 4 byte aligned.
-    const base = @ptrToInt(&root.trap);
-
-    if (base & 0x3 != 0) {
-        @panic("trap base not 4 byte aligned!"); 
-    }
-
-    // set the trap handle
-    asm volatile (
-        \\csrw stvec, %[val]
-        : : [val] "r" (base) 
-    ); 
-
-}
-
 comptime {
     _ = @import("elf.zig"); 
 }
+
+pub const trap_handle = 
+    trap_value: {
+        if (@hasDecl(root, "trap")) 
+            break :trap_value root.trap;
+        if (@hasDecl(root, "trap_handle")) 
+            break :trap_value root.trap_handle; 
+        @compileError("no trap handler found");
+    }; 
+        

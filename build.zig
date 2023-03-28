@@ -1,4 +1,4 @@
-const Builder = @import("std").build.Builder;
+const Build = @import("std").Build; 
 const builtin = @import("builtin");
 const std = @import("std");
 
@@ -6,7 +6,25 @@ const stdout = std.io.getStdOut().writer();
 
 const CrossTarget = std.zig.CrossTarget;
 
-pub fn build(b: *Builder) !void {
+var allo : * std.mem.Allocator = undefined; 
+
+pub fn build(b: *Build) !void {
+
+    const echo_step : * Build.Step = b.step( "echo", "..." ); 
+
+    allo = & b.allocator; 
+
+    echo_step.makeFn = struct {
+        fn make(step: *Build.Step) !void {
+            _ = step; 
+            try stdout.print("echo step. \n", .{}); 
+            var sp = std.ChildProcess.init( &[_] [] const u8 {
+                "ls", 
+            }, allo.* ); 
+            const term = try sp.spawnAndWait(); 
+            try stdout.print( "exit with code: {}.\n", .{ term.Exited }); 
+        }
+    }.make; 
 
     const select = try CrossTarget.parse(.{
         .arch_os_abi = "riscv64-freestanding-none", 
@@ -29,15 +47,10 @@ pub fn build(b: *Builder) !void {
     // set the code model as 'medium', to avoid the limitation of the text lookup. 
     src.code_model = std.builtin.CodeModel.medium;
     // disable LTO, to keep the 'unused' data. 
-    src.want_lto = false; 
+    src.want_lto = true; 
     // set the link script. 
     src.setLinkerScriptPath(.{ .path = "src/linker.ld" });
 
     src.install(); 
-
-    const bin = b.addInstallRaw(src, "out.bin", .{ .format = .bin });
-    bin.step.dependOn(&src.step);
-
-    const build_bin = b.step("bin", "generate the binary object. "); 
-    build_bin.dependOn(&bin.step);
 }
+

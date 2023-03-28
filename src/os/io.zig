@@ -7,9 +7,10 @@
 //! io module should use the sbi interface to output the info, on the console. 
 //! 
 
+const os = @import("root") .os; 
 /// The sbi interface module. 
 /// The sbi interface is the core interface to interact with the OS. (actually by sbi to manipulate the machine) 
-const sbi = @import("root").os.sbi; 
+const sbi = os.sbi; 
 
 /// ### The stdout instance. 
 /// The stdout is the globally unique instance of `Stdout`.
