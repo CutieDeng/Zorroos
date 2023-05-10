@@ -3,27 +3,37 @@
 \usepackage{multicol} %用于实现在同一页中实现不同的分栏
 \usepackage[utf8]{inputenc}
 
-\title{Process Scheduling Of the Operating System In Personal Computer }
+\title{Process Scheduling of the Operating System In Personal Computer }
 \author{Kong Dewei}
 \date{Deng Zhiren}
 
 \begin{document}
 
 \maketitle
-\textbf{\emph{Abstract}--At present, different operating systems have very different process scheduling strategies. Since the cost of upgrading hardware resources is not cheap, a proper process scheduling strategy is an effective way to enhance user experience. Prior research has come up with different thinking of scheduling, we plan to use diagrams to allocate computing resources, as well as realizing a new operating system based on openSBI with our scheduling strategy. }
+\textbf{
+    \emph{Abstract}
+    --At present, different operating systems have very different process scheduling strategies.
+    Since the cost of upgrading hardware resources is not cheap, a proper process scheduling strategy is an effective way to enhance user experience.
+    Prior research has come up with different thinking of scheduling, we plan to use diagrams to allocate computing resources, as well as realizing a new operating system based on openSBI with our scheduling strategy.
+}
 \begin{multicols}{2}       % 分两栏 若花括号中为3则是分三列
-
 
 \section{Introduction}
 
+
+
 \section{Related work}
-Prior research has attempted to use Red-Black Tree to handle process scheduling, the algorithm is known as Completely Fair Scheduler(CFS). The objective of this algorithm is to give all processes a run time proportional to their priority. CFS is a scheduling algorithm for isomorphic symmetric multi-core processors. It is also adopted by the process scheduler in Linux2.6.23 and later kernel releases. The drawback of CFS is that its fairness is only reflected among the local processes of each processor core. Therefore, another research paper proposed a new fairness scheduling algorithm DWRR for isomorphic symmetric multi-core processors.
+Prior research has attempted to use Red-Black Tree to handle process scheduling, the algorithm is known as Completely Fair Scheduler(CFS).
+The objective of this algorithm is to give all processes a run time proportional to their priority.
+CFS is a scheduling algorithm for isomorphic symmetric multi-core processors.
+It is also adopted by the process scheduler in Linux2.6.23 and later kernel releases.
+The drawback of CFS is that its fairness is only reflected among the local processes of each processor core.
+Therefore, another research paper proposed a new fairness scheduling algorithm DWRR for isomorphic symmetric multi-core processors.
 
 Distributed Weight Round Robin(DWRR) Scheduler, inspired by the O (1) algorithm, organizes the process queue into two queues: active queue and expired queue. DWRR maintains the scheduling fairness among all processes on different processor cores by using the concepts of round number and round balancing. CFS and DWRR are currently the state-of-art fair scheduling algorithm for isomorphic symmetric multi-core processors. 
 
 \section{Principles of The Project}
 \section{Implementations of the project}
 \end{multicols}
-
 
 \end{document}

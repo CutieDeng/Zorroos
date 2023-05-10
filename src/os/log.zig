@@ -1,10 +1,13 @@
 //! Log module. 
 //! In this module, you can use log in different level and make them 
-pub const LogLevel = enum { Debug, Info, Warn, Error, }; 
+// pub const LogLevel = enum { Debug, Info, Warn, Error, }; 
+pub const LogLevel = std.log.Level; 
 
 const os = @import("root").os; 
 /// io module is used to print log.
 const io = os.io; 
+
+const std = @import("std"); 
 
 /// The default log level is Debug. 
 /// You can change it to other level to filter log. 

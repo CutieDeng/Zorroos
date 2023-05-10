@@ -10,21 +10,21 @@ var allo : * std.mem.Allocator = undefined;
 
 pub fn build(b: *Build) !void {
 
-    const echo_step : * Build.Step = b.step( "echo", "..." ); 
+    // const echo_step : * Build.Step = b.step( "echo", "..." ); 
 
     allo = & b.allocator; 
 
-    echo_step.makeFn = struct {
-        fn make(step: *Build.Step) !void {
-            _ = step; 
-            try stdout.print("echo step. \n", .{}); 
-            var sp = std.ChildProcess.init( &[_] [] const u8 {
-                "ls", 
-            }, allo.* ); 
-            const term = try sp.spawnAndWait(); 
-            try stdout.print( "exit with code: {}.\n", .{ term.Exited }); 
-        }
-    }.make; 
+    // echo_step.makeFn = struct {
+    //     fn make(step: *Build.Step) !void {
+    //         _ = step; 
+    //         try stdout.print("echo step. \n", .{}); 
+    //         var sp = std.ChildProcess.init( &[_] [] const u8 {
+    //             "ls", 
+    //         }, allo.* ); 
+    //         const term = try sp.spawnAndWait(); 
+    //         try stdout.print( "exit with code: {}.\n", .{ term.Exited }); 
+    //     }
+    // }.make; 
 
     const select = try CrossTarget.parse(.{
         .arch_os_abi = "riscv64-freestanding-none", 
@@ -39,7 +39,7 @@ pub fn build(b: *Build) !void {
 
     const src = b.addExecutable( std.build.ExecutableOptions {
         .name = "out", 
-        .root_source_file = std.Build.FileSource { .path = "src/app.zig" }, 
+        .root_source_file = std.Build.FileSource { .path = "src/virtual_app.zig" }, 
         .target = select, 
         .optimize = std.builtin.Mode.ReleaseSafe, 
     }); 

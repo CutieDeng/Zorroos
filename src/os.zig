@@ -3,7 +3,6 @@
 //! - (abi) abi call : globally abi call handle. 
 //! - (rt) runtime : export the symbol `_start` for program start, init the stack. implicitly some global variables would init here. 
 //! - (io) output support: define the terminal output (by sbi interface) format object: writer. 
-//! - 
 
 /// sbi support 
 pub const sbi = @import("os/sbi.zig"); 
@@ -17,7 +16,6 @@ pub const log = @import("os/log.zig");
 pub const std = @import("std"); 
 /// trap support 
 pub const trap = @import("os/trap.zig");
-
 
 /// global panic support 
 pub fn panic(error_message: []const u8, stack: ?*std.builtin.StackTrace, len: ?usize) noreturn {
@@ -46,3 +44,4 @@ pub const trap_handle =
         @compileError("no trap handler found");
     }; 
         
+pub const virtual_memory_offset : usize = 0; 

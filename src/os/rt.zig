@@ -33,7 +33,7 @@ fn emptyBss() callconv(.Inline) void {
 
 /// init fn array: define the init functions orderly, call them to initialize the runtime. 
 /// - emptyBss: this fn flush the segment '.bss' . 
-pub const init = [_] *const fn () callconv(.Inline) void { emptyBss, setTrap, }; 
+pub const init = [_] *const fn () callconv(.Inline) void { emptyBss, setTrap, os.trap.init_virtual_memory }; 
 
 const os = @import("root") .os; 
 

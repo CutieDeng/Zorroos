@@ -1,17 +1,17 @@
 pub const TrapContext = extern struct {
-    x: [32] usize, 
-    sstatus: usize, 
-    sepc: usize, 
-}; 
+    x: [32]usize,
+    sstatus: usize,
+    sepc: usize,
+};
 
-const os = @import("root").os; 
-const std = @import("std"); 
+const os = @import("root").os;
+const std = @import("std");
 
 comptime {
-    @export(@import("root").trap, std.builtin.ExportOptions {
+    @export(@import("root").trap, std.builtin.ExportOptions{
         .name = "trap_handle",
-        .section = ".text", 
-    }); 
+        .section = ".text",
+    });
 }
 
 comptime {
@@ -40,7 +40,6 @@ comptime {
         \\sd t2, 2*8(sp)
         \\mv a0, sp
         \\call trap_handle
-
         \\.macro loadrg n
         \\  ld x\n, \n*8(sp)
         \\.endm 
@@ -62,8 +61,44 @@ comptime {
         \\addi sp, sp, 34*8
         \\csrrw sp, sscratch, sp
         \\sret 
+    );
+}
+
+pub extern fn restore(kernel_stack_pointer: *TrapContext) callconv(.C) noreturn;
+pub extern fn trap() align(4) callconv(.C) void;
+
+pub const kernel_memory_page : [4096] u8 align(4096) = [_] u8 { 0 } ** 4096; 
+
+pub const log = os.log; 
+
+pub fn init_virtual_memory() callconv(.Inline) void {
+    // const then_actual_ptr = @ptrToInt(then); 
+    if (os.virtual_memory_offset % 4 != 0) { 
+        @compileError("virtual memory offset must be a multiple of 4"); 
+    } 
+    const then_virtual_ptr = 4 +% os.virtual_memory_offset; 
+    const then_virtual_fn = @intToPtr(*align(4) const fn () void, then_virtual_ptr); 
+    log.info("kernel memory page: {*}", .{&kernel_memory_page});
+    log.info("then_virtual_fn = {x}", .{then_virtual_fn});  
+    if (true) {
+        return ; 
+    }
+    // write this ptr to the trap vector ~ 
+    asm volatile (
+        \\csrw stvec, %0
+        : : [ptr] "r" (then_virtual_fn) 
+    ); 
+    // attempt to build the virtual page at the physical page x 
+    var x: usize = undefined; 
+    var ptr = @shlExact(x, 12); 
+    asm volatile (
+        \\csrw satp, %0
+        : : [ptr] "r" (ptr) 
+    ); 
+    // set the mmu 
+    asm volatile (
+        \\csrw mstatus, %0
+        : : [ptr] "r" (0x1800) 
     ); 
 }
 
-pub extern fn restore( kernel_stack_pointer: * TrapContext ) callconv(.C) noreturn ; 
-pub extern fn trap() align(4) callconv(.C) void; 

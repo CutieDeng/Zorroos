@@ -6,5 +6,5 @@ $QEMU \
     -machine virt \
     -nographic \
     -bios default \
-    -kernel ./zig-out/bin/out.bin \
+    -kernel ./zig-out/bin/out \
     $*
