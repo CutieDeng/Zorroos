@@ -5,14 +5,19 @@ pub const TrapContext = extern struct {
 };
 
 const os = @import("root").os;
-const std = @import("std");
+const std = os.std; 
 
 comptime {
-    @export(@import("root").trap, std.builtin.ExportOptions{
+    // 向全局导出异常处理符号 trap_handle 
+    @export(os.trap_handle, std.builtin.ExportOptions{
         .name = "trap_handle",
         .section = ".text",
     });
 }
+
+// trap 符号：用于预处理当前的栈结构；
+// restore 符号：用于恢复当前的栈结构；
+// trap_handle 符号：实际处理中断的代码
 
 comptime {
     asm (
@@ -43,6 +48,7 @@ comptime {
         \\.macro loadrg n
         \\  ld x\n, \n*8(sp)
         \\.endm 
+        \\.align 2
         \\restore: 
         \\  mv sp, a0
         \\  ld t0, 32*8(sp)
@@ -64,7 +70,8 @@ comptime {
     );
 }
 
-pub extern fn restore(kernel_stack_pointer: *TrapContext) callconv(.C) noreturn;
+pub extern fn restore(kernel_stack_pointer: *TrapContext) align(4) callconv(.C) noreturn;
+
 pub extern fn trap() align(4) callconv(.C) void;
 
 pub const kernel_memory_page : [4096] u8 align(4096) = [_] u8 { 0 } ** 4096; 

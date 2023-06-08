@@ -5,7 +5,7 @@ extern const app_numbers: usize ;
 const app_info = @ptrCast([*]usize, &app_numbers); 
 
 pub const os = @import("os.zig"); 
-const log = os.log; 
+const log = std.log; 
 const std = os.std; 
 
 pub const code = @import("riscv/code.zig"); 
@@ -14,7 +14,7 @@ export fn main() callconv(.C) void {
 
     os.init(); 
 
-    log.debug("init os", .{}); 
+    // log.debug("{s}", .{ "init os" }); 
 
     { 
         var len = app_info[0]; 
@@ -76,11 +76,9 @@ pub const Manager = struct {
     }
 }; 
 
-/// define the panic function, as the os kernel function . 
-pub const panic = os.panic; 
 
 const TrapContext = os.trap.TrapContext; 
-pub fn trap(trap_context: *TrapContext) callconv(.C) *TrapContext {
+pub fn trap_handle(trap_context: *TrapContext) callconv(.C) *TrapContext {
     const scause: usize = asm (
         \\csrr %[r1], scause
         : [r1] "=r" (-> usize) 
@@ -113,3 +111,9 @@ pub fn trap(trap_context: *TrapContext) callconv(.C) *TrapContext {
 comptime {
     _ = @import("app/apps.zig"); 
 } 
+
+/// 全局 std_options 定义
+pub const std_options = os.std_options; 
+
+/// 全局 panic 函数定义
+pub const panic = os.panic; 

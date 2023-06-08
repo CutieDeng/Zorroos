@@ -1,27 +1,30 @@
-//! os kernel module, including some modules: 
-//! - (sbi) sbi call : globally sbi call, without sync support / async support. [[TODO]]
-//! - (abi) abi call : globally abi call handle. 
-//! - (rt) runtime : export the symbol `_start` for program start, init the stack. implicitly some global variables would init here. 
-//! - (io) output support: define the terminal output (by sbi interface) format object: writer. 
+//! 操作系统内核核心组件，所有其他模块的父模块。
+//! 
+//! 该模块包含了以下各模块：
+//! 
+//! - (sbi) sbi 调用：全局的 sbi 调用，不包含同步支持 / 异步支持。[[TODO]] 
+//! - (rt) 基础程序运行时：导出 `_start` 符号，初始化栈，并进行 bss 的零初始化。[[TODO: 多核初始化支持]]
+//! - (io) 输出支持：定义了最基础的终端输出对象 io.stdout, 通过 sbi 接口输出。 
+//! - (trap) 中断支持：定义了基础的中断处理函数，以及中断处理函数的注册接口[[TODO]]。 
 
-/// sbi support 
+/// sbi 模块
 pub const sbi = @import("os/sbi.zig"); 
-/// c runtime support 
+/// c runtime 模块
 pub const rt = @import("os/rt.zig"); 
-/// output support 
+/// io 模块
 pub const io = @import("os/io.zig"); 
-/// log support 
-pub const log = @import("os/log.zig");
-/// std lib support 
+/// zig 标准库
 pub const std = @import("std"); 
-/// trap support 
+/// trap 模块
 pub const trap = @import("os/trap.zig");
+/// log 模块
+pub const log = std.log; 
 
-/// global panic support 
+/// 全局 panic 函数
 pub fn panic(error_message: []const u8, stack: ?*std.builtin.StackTrace, len: ?usize) noreturn {
     _ = stack; 
     _ = len; 
-    log.err("panic: {s}", .{ error_message, } ); 
+    std.log.err("panic: {s}", .{ error_message, } ); 
     sbi.shutdown(); 
 }
 
@@ -35,13 +38,26 @@ comptime {
     _ = @import("elf.zig"); 
 }
 
+/// 异常、中断处理函数
 pub const trap_handle = 
-    trap_value: {
-        if (@hasDecl(root, "trap")) 
-            break :trap_value root.trap;
-        if (@hasDecl(root, "trap_handle")) 
-            break :trap_value root.trap_handle; 
-        @compileError("no trap handler found");
-    }; 
+    root.trap_handle; 
         
 pub const virtual_memory_offset : usize = 0; 
+
+pub const std_options = struct {
+    pub fn logFn(
+        comptime message_level: std.log.Level, 
+        comptime scope: @Type(.EnumLiteral), 
+        comptime format:[] const u8, 
+        args: anytype, 
+    ) void {
+        const level_txt = comptime message_level.asText();
+        const prefix2 = if (scope == .default) ": " else "(" ++ @tagName(scope) ++ "): ";
+        const stderr = io.stdout.writer(); 
+        // origin codes in std; 
+        // const stderr = std.io.getStdErr().writer();
+        // std.debug.getStderrMutex().lock();
+        // defer std.debug.getStderrMutex().unlock();
+        nosuspend stderr.print(level_txt ++ prefix2 ++ format ++ "\n", args) catch return;
+    }
+}; 

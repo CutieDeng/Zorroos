@@ -2,6 +2,11 @@
 //! In this module, the start entry `_start` is defined, and it would jump to the function `main`, which defined in root project ~ 
 //! Also, the stack part is defined here, with the size 4KiB. 
 //! Some symbols defined in linker script are used here to give a better initialize support. 
+//! 
+
+const os = @import("root").os; 
+const std = os.std; 
+
 
 comptime {
     asm (
@@ -11,6 +16,7 @@ comptime {
         \\  la sp, boot_stack_top
         \\  call main 
         \\.section .bss.stack 
+        \\.align 12 
         \\boot_stack:
         \\.space 4096
         \\.globl boot_stack_top
@@ -33,9 +39,12 @@ fn emptyBss() callconv(.Inline) void {
 
 /// init fn array: define the init functions orderly, call them to initialize the runtime. 
 /// - emptyBss: this fn flush the segment '.bss' . 
-pub const init = [_] *const fn () callconv(.Inline) void { emptyBss, setTrap, os.trap.init_virtual_memory }; 
+pub const init = [_] *const fn () callconv(.Inline) void 
+    { 
+        emptyBss, 
+        setTrap, 
+    } ;
 
-const os = @import("root") .os; 
 
 fn setTrap() callconv(.Inline) void {
     // the addr [XLEN - 1: 2] handle addr ; 
@@ -44,9 +53,7 @@ fn setTrap() callconv(.Inline) void {
     // const base = @ptrToInt(&os.trap.trap); 
     const base = @ptrToInt(&os.trap.trap); 
 
-    if (base & 0x3 != 0) {
-        @panic("trap base not 4 byte aligned!"); 
-    }
+    std.debug.assert(base & 0x3 == 0); 
 
     // set the trap handle
     asm volatile (
