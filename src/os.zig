@@ -23,7 +23,7 @@ pub const log = std.log;
 pub const memory = @import("os/memory.zig");
 
 /// 虚拟地址入口
-pub fn vmain() void {
+pub fn vmain() align(4) void {
     asm volatile ("sfence.vma");
     rt.setTrap(0);
     @call(.always_inline, root.vmain, .{});

@@ -13,9 +13,6 @@ pub const code = @import("riscv/code.zig");
 pub fn vmain() void {
     log.info("{s}", .{"get into vmain! "});
     log.info("my addr: {*}", .{&vmain});
-    // var a1: f32 = 3.0;
-    // var a2: f32 = std.math.sqrt(a1);
-    // log.info("sqrt({}) = {}", .{ a1, a1 });
     os.sbi.shutdown();
 }
 

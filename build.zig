@@ -29,9 +29,9 @@ pub fn build(b: *Build) !void {
 
     try stdout.print("riscv64 os build support. \n", .{});
 
-    if (b.sysroot) |rootdir| {
-        try stdout.print("rootdir: {s}\n", .{rootdir});
-    }
+    // if (b.sysroot) |rootdir| {
+    //     try stdout.print("rootdir: {s}\n", .{rootdir});
+    // }
 
     const src = b.addExecutable(std.build.ExecutableOptions{
         .name = "out",

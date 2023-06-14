@@ -1,6 +1,6 @@
 #!/bin/sh 
 
-QEMU=qemu-system-riscv64
+QEMU=~/Downloads/qemu/qemu-system-riscv64
 
 $QEMU \
     -machine virt \
