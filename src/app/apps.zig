@@ -13,14 +13,14 @@ comptime {
         \\.quad app2_end
         \\.section .data 
         \\app0_start: 
-        \\.incbin "apps/raw/zig-out/bin/hello.bin"
+        \\.incbin "apps/hello/zig-out/bin/hello.bin"
         \\app0_end: 
         \\.section .data
         \\app1_start:
-        \\.incbin "apps/raw/zig-out/bin/hello.bin"
+        \\.incbin "apps/hello/zig-out/bin/hello.bin"
         \\app1_end:
         \\app2_start: 
-        \\ .incbin "apps/raw/zig-out/bin/hello.bin"
+        \\ .incbin "apps/hello/zig-out/bin/hello.bin"
         \\app2_end: 
     );
 }
